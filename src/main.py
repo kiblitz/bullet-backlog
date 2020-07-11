@@ -6,6 +6,7 @@ import descriptions
 import dir_handler
 import errors
 import init
+import new
 
 def main():
   args = sys.argv
@@ -20,10 +21,10 @@ def main():
     else:
       print(errors.bullet_exists()) 
     init.init()
-  elif args[1] == '':
-    pass
+  elif args[1] == 'new':
+    new.new()
   else:
     print(descriptions.unknown())
-    
+
 if __name__ == "__main__":
   main()
