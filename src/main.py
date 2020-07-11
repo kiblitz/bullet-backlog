@@ -3,6 +3,9 @@
 import sys
 
 import descriptions
+import dir_handler
+import errors
+import init
 
 def main():
   args = sys.argv
@@ -10,8 +13,13 @@ def main():
   if num == 1:
     print(descriptions.help()) 
     return
-  if args[1] == '':
-    pass
+  if args[1] == 'init':
+    # TODO init animation
+    if not dir_handler.has_bullet():
+      init.init()
+    else:
+      print(errors.bullet_exists()) 
+    init.init()
   elif args[1] == '':
     pass
   else:

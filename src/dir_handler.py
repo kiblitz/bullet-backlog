@@ -1,5 +1,11 @@
 import os
 
+def mk_bullet():
+  os.mkdir('.bullet')
+
+def has_bullet():
+  os.path.isdir('.bullet')
+
 def find_bullet():
   path = os.getcwd()
   while True:
