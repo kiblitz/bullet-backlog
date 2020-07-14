@@ -11,7 +11,19 @@ def on_tasks(path, *argv):
   conn.close() 
 
 def create_tasks_db(path):
-  on_tasks(path + 'tasks.db', create_task_table)
+  on_tasks(path + 'tasks.db', create_task_tables)
+
+def create_task_tables(cursor):
+  create_task_table(cursor)
+  create_tag_table(cursor)
+  create_child_table(cursor)
+  create_parent_table(cursor)
+
+def delete_task_tables(cursor):
+  delete_task_table(cursor)
+  delete_tag_table(cursor)
+  delete_child_table(cursor)
+  delete_parent_table(cursor)
 
 def create_task_table(cursor):
   cursor.execute('''CREATE TABLE tasks
@@ -28,3 +40,15 @@ def create_child_table(cursor):
 def create_parent_table(cursor):
   cursor.execute('''CREATE TABLE parent
                 (task_id INTEGER, parent_id INTEGER)''')
+
+def delete_task_table(cursor):
+  cursor.execute('''DELETE FROM tasks''')
+
+def delete_tag_table(cursor):
+  cursor.execute('''DELETE FROM tags''')
+
+def delete_child_table(cursor):
+  cursor.execute('''DELETE FROM children''')
+
+def delete_parent_table(cursor):
+  cursor.execute('''DELETE FROM parent''')
