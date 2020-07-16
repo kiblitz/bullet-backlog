@@ -1,5 +1,7 @@
 import sqlite3
 
+idx = 0
+
 def create_tasks_db(path):
   __on_tasks(path + 'tasks.db', __create_task_tables)
 
@@ -10,28 +12,26 @@ def reset_tasks_db(path):
   __on_tasks(path + 'tasks.db', __delete_task_tables, __create_task_tables)
 
 def new_task(path, title, body, tags, parents, children):
-  __on_tasks_with_args(path, __create_task, title, body, tags, parents, children)
+  __on_tasks_with_args(path, 
+    (__create_task, title, body), 
+    (__create_task_tags, tags), 
+    (__create_task_parents, parents), 
+    (__create_task_children, children))
 
-def __insert(conn, table, columns, args, autocommit=True):
+def __insert(cursor, table, columns, args):
   sql = "INSERT INTO " + table + totuple(columns) + " VALUES" + qmark_args(len(args))
-  cursor = conn.cursor()
   cursor.execute(sql, args)
-  if autocommit:
-    conn.commit()
   return cursor.lastrowid
 
-def __update(conn, table, what, conditions, autocommit=True):
+def __update(cursor, table, what, conditions):
   sql = "UPDATE " + table + " SET " + what + " " + conditions
-  cursor = conn.cursor()
   cursor.execute(sql)
-  if autocommit:
-    conn.commit()
   return cursor.lastrowid
 
-def __select(conn, table, what, conditions):
+def __select(cursor, table, what, conditions):
+  sql = "SELECT " + what + " FROM " + table + " " + conditions
   cursor = conn.cursor()
-  res = cursor.execute("SELECT " + what + " FROM " + table + " " + conditions)
-  return res.fetchall()
+  return cursor.execute(sql).fetchall()
 
 def __qmark_args(num):
   s = '('
@@ -55,14 +55,33 @@ def __on_tasks(path, *argv):
   c.close()
   conn.close() 
 
-def __on_tasks_with_args(path, func, *argv):
+def __on_tasks_with_args(path, *argv):
   db_path = path + 'tasks.db'
   conn = sqlite3.connect(db_path)
   c = conn.cursor()
-  func(c, *argv)
+  for arg in argv:
+    arg[0](c, arg[1:])
   conn.commit()
   c.close()
   conn.close() 
+
+def __create_task(cursor, title, body):
+  global idx
+  idx = __insert(cursor, 'tasks', ('title', 'body'), (title, body)) 
+
+def __create_task_tags(cursor, tags):
+  for tag in tags:
+    __insert(cursor, 'tags', ('task_id', 'tag'), (idx, tag)) 
+
+def __create_task_parents(cursor, parents):
+  for parent in parents:
+    __insert(cursor, 'parents', ('task_id', 'parent_id'), (idx, parent)) 
+    __insert(cursor, 'children', ('task_id', 'child_id'), (parent, idx)) 
+
+def __create_task_children(cursor, children):
+  for child in children:
+    __insert(cursor, 'children', ('task_id', 'child_id'), (idx, child)) 
+    __insert(cursor, 'parents', ('task_id', 'parent_id'), (child, idx)) 
 
 def __create_task_tables(cursor):
   __create_task_table(cursor)
@@ -78,7 +97,7 @@ def __delete_task_tables(cursor):
 
 def __create_task_table(cursor):
   cursor.execute('''CREATE TABLE tasks
-                (task_id INTEGER, title TEXT, body TEXT)''')
+                (task_id INTEGER PRIMARY KEY, title TEXT, body TEXT)''')
 
 def __create_tag_table(cursor):
   cursor.execute('''CREATE TABLE tags
@@ -89,7 +108,7 @@ def __create_child_table(cursor):
                 (task_id INTEGER, child_id INTEGER)''')
 
 def __create_parent_table(cursor):
-  cursor.execute('''CREATE TABLE parent
+  cursor.execute('''CREATE TABLE parents
                 (task_id INTEGER, parent_id INTEGER)''')
 
 def __delete_task_table(cursor):
@@ -102,4 +121,4 @@ def __delete_child_table(cursor):
   cursor.execute('''DELETE FROM children''')
 
 def __delete_parent_table(cursor):
-  cursor.execute('''DELETE FROM parent''')
+  cursor.execute('''DELETE FROM parents''')
