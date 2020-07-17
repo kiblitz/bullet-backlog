@@ -3,13 +3,13 @@ import sqlite3
 idx = 0
 
 def create_tasks_db(path):
-  __on_tasks(path + 'tasks.db', __create_task_tables)
+  __on_tasks(path, __create_task_tables)
 
 def delete_tasks_db(path):
-  __on_tasks(path + 'tasks.db', __delete_task_tables)
+  __on_tasks(path, __delete_task_tables)
 
 def reset_tasks_db(path):
-  __on_tasks(path + 'tasks.db', __delete_task_tables, __create_task_tables)
+  __on_tasks(path, __delete_task_tables, __create_task_tables)
 
 def new_task(path, title, body, tags, parents, children):
   __on_tasks_with_args(path, 
@@ -17,6 +17,9 @@ def new_task(path, title, body, tags, parents, children):
     (__create_task_tags, tags), 
     (__create_task_parents, parents), 
     (__create_task_children, children))
+
+def task_exists(task_id):
+  return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))) != 0 
 
 def __insert(cursor, table, columns, args):
   sql = "INSERT INTO " + table + totuple(columns) + " VALUES" + qmark_args(len(args))

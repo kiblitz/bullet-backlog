@@ -19,8 +19,7 @@ def new():
   parents = []
   parent = input('parents: ')
   while parent != '':
-    # TODO check if id exists
-    if True:
+    if db_handler.task_exists(parent):
       parents.append(parent)
     else:
       print('task id <' + parent + '> not found') 
@@ -29,8 +28,7 @@ def new():
   children = []
   child = input('children: ')
   while child != '':
-    # TODO check if id exists
-    if True:
+    if db_handler.task_exists(child):
       children.append(child)
     else:
       print('task id <' + child + '> not found') 

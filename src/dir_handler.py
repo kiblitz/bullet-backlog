@@ -9,8 +9,8 @@ def has_bullet():
 def find_bullet():
   path = os.getcwd()
   while True:
-    if os.path.isdir(path + '/.bullet'):
-      return path + '/.bullet'
+    if os.path.isdir(path + '/.bullet/'):
+      return path + '/.bullet/'
     if path == '/':
       return False
     path = __get_parent(path)
