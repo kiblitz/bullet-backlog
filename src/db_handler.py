@@ -1,7 +1,5 @@
 import sqlite3
 
-idx = 0
-
 def create_tasks_db(path):
   __on_tasks(path, __create_task_tables)
 
@@ -11,30 +9,52 @@ def delete_tasks_db(path):
 def reset_tasks_db(path):
   __on_tasks(path, __delete_task_tables, __create_task_tables)
 
-def new_task(path, title, body, tags, parents, children):
-  __on_tasks_with_args(path, 
-    (__create_task, title, body), 
-    (__create_task_tags, tags), 
-    (__create_task_parents, parents), 
-    (__create_task_children, children))
+def new_task(path, title, body):
+  __on_tasks_with_args(path, (__create_task, title, body))
 
-def task_exists(task_id):
-  return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))) != 0 
+def tag_task(path, task_id, tags):
+  __on_tasks_with_args(path, (__create_task_tags, task_id, tags))
+
+def parent_task(path, task_id, parents):
+  __on_tasks_with_args(path, (__create_task_parents, task_id, parents))
+
+def child_task(path, task_id, children):
+  __on_tasks_with_args(path, (__create_task_children, task_id, children))
+
+def __create_task(cursor, title, body):
+  __insert(cursor, 'tasks', ('title', 'body'), (title, body))
+
+def __create_task_tags(cursor, task_id, tags):
+  for tag in tags:
+    __insert(cursor, 'tags', ('task_id', 'tag'), (task_id, tag))
+
+def __create_task_parents(cursor, task_id, parents):
+  for parent in parents:
+    __insert(cursor, 'parents', ('task_id', 'parent_id'), (task_id, parent))
+    __insert(cursor, 'children', ('task_id', 'child_id'), (parent, task_id))
+
+def __create_task_children(cursor, task_id, children):
+  for child in children:
+    __insert(cursor, 'children', ('task_id', 'child_id'), (task_id, child))
+    __insert(cursor, 'parents', ('task_id', 'parent_id'), (child, task_id))
+
+def task_exists(path, task_id):
+  return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0
 
 def __insert(cursor, table, columns, args):
-  sql = "INSERT INTO " + table + totuple(columns) + " VALUES" + qmark_args(len(args))
+  sql = "INSERT INTO " + table + __totuple(columns) + " VALUES" + __qmark_args(len(args))
   cursor.execute(sql, args)
   return cursor.lastrowid
 
 def __update(cursor, table, what, conditions):
-  sql = "UPDATE " + table + " SET " + what + " " + conditions
+  sql = "UPDATE " + table + " SET " + what + " WHERE " + conditions
   cursor.execute(sql)
   return cursor.lastrowid
 
 def __select(cursor, table, what, conditions):
-  sql = "SELECT " + what + " FROM " + table + " " + conditions
-  cursor = conn.cursor()
-  return cursor.execute(sql).fetchall()
+  sql = "SELECT " + what + " FROM " + table + " WHERE " + conditions
+  cursor.execute(sql)
+  return cursor.fetchall()
 
 def __qmark_args(num):
   s = '('
@@ -52,39 +72,25 @@ def __on_tasks(path, *argv):
   db_path = path + 'tasks.db'
   conn = sqlite3.connect(db_path)
   c = conn.cursor()
+  res = []
   for arg in argv:
-    arg(c)
+    res.append(arg(c))
   conn.commit()
   c.close()
-  conn.close() 
+  conn.close()
+  return res
 
 def __on_tasks_with_args(path, *argv):
   db_path = path + 'tasks.db'
   conn = sqlite3.connect(db_path)
   c = conn.cursor()
+  res = []
   for arg in argv:
-    arg[0](c, arg[1:])
+    res.append(arg[0](c, *arg[1:]))
   conn.commit()
   c.close()
-  conn.close() 
-
-def __create_task(cursor, title, body):
-  global idx
-  idx = __insert(cursor, 'tasks', ('title', 'body'), (title, body)) 
-
-def __create_task_tags(cursor, tags):
-  for tag in tags:
-    __insert(cursor, 'tags', ('task_id', 'tag'), (idx, tag)) 
-
-def __create_task_parents(cursor, parents):
-  for parent in parents:
-    __insert(cursor, 'parents', ('task_id', 'parent_id'), (idx, parent)) 
-    __insert(cursor, 'children', ('task_id', 'child_id'), (parent, idx)) 
-
-def __create_task_children(cursor, children):
-  for child in children:
-    __insert(cursor, 'children', ('task_id', 'child_id'), (idx, child)) 
-    __insert(cursor, 'parents', ('task_id', 'parent_id'), (child, idx)) 
+  conn.close()
+  return res
 
 def __create_task_tables(cursor):
   __create_task_table(cursor)

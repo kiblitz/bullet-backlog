@@ -2,18 +2,20 @@ import os
 
 def mk_bullet():
   os.mkdir('.bullet')
+  return __append_bullet_folder(os.getcwd())
 
 def has_bullet():
-  os.path.isdir('.bullet')
+  return os.path.isdir('.bullet')
 
 def find_bullet():
   path = os.getcwd()
   while True:
-    if os.path.isdir(path + '/.bullet/'):
-      return path + '/.bullet/'
+    with_bullet = __append_bullet_folder(path)
+    if os.path.isdir(with_bullet):
+      return with_bullet
     if path == '/':
       return False
-    path = __get_parent(path)
+    path = os.path.dirname(path)
 
-def __get_parent(directory):
-  return os.path.dirname(directory)
+def __append_bullet_folder(path):
+  return path + '/.bullet/'

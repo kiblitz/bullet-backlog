@@ -1,37 +1,16 @@
 import db_handler
+import dir_handler
 import errors
 
-def new():
-  path = find_bullet()
+def new(title_given, title, body_given, body):
+  path = dir_handler.find_bullet()
   if not path:
-    print(errors.no_bullet()) 
+    print(errors.no_bullet())
     return
 
-  title = input('title: ')
-  body = input('body: ')
+  if not title_given:
+    title = input('title: ')
+  if not body_given:
+    body = input('body: ')
 
-  tags = []
-  tag = input('tags: ')
-  while tag != '':
-    tags.append(tag)
-    tag = input('tags: ') 
-
-  parents = []
-  parent = input('parents: ')
-  while parent != '':
-    if db_handler.task_exists(parent):
-      parents.append(parent)
-    else:
-      print('task id <' + parent + '> not found') 
-    parent = input('parents: ')  
-
-  children = []
-  child = input('children: ')
-  while child != '':
-    if db_handler.task_exists(child):
-      children.append(child)
-    else:
-      print('task id <' + child + '> not found') 
-    child = input('children: ')  
-
-  db_handler.new_task(path, title, body, tags, parents, children)
+  db_handler.new_task(path, title, body)
