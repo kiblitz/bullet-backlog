@@ -24,22 +24,13 @@ def __main():
     body_given = False
     title = ''
     body = ''
-    while rest:
-      if rest[0] == '--title':
-        if len(rest) > 1:
-          title_given = True 
-          title = rest[1]
-        else:
-          print(errors.no_title())
-          return
-      if rest[0] == '--body':
-        if len(rest) > 1:
-          body_given = True 
-          body = rest[1]
-        else:
-          print(errors.no_body())
-          return
-      rest = rest[2:]
+    if rest:
+      title_given = True 
+      title = rest[0]
+      rest = rest[1:]
+    if rest:
+      body_given = True
+      body = ' '.join(rest).replace('\n', '').strip()
     new.new(title_given, title, body_given, body)
   elif args[1] in ('tag', 'untag', 'parent', 'unparent', 'child', 'unchild'):
     if num < 3:

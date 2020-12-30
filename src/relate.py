@@ -28,7 +28,10 @@ def __manage_relations(action, task_id, relatives):
   valid = True
   for relative in relatives:
     if not relative.isdigit() or not db_handler.task_exists(path, relative):
-      print(errors.relative_not_found(relative))
+      print(errors.task_not_found(relative))
+      valid = False
+    if relative == task_id:
+      print(errors.self_relative())
       valid = False
   if not valid:
     return

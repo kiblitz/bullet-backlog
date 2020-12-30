@@ -140,7 +140,10 @@ def __delete_task_tables(cursor):
 
 def __create_task_table(cursor):
   cursor.execute('''CREATE TABLE tasks
-                (task_id INTEGER PRIMARY KEY, title TEXT, body TEXT)''')
+                (task_id INTEGER PRIMARY KEY, 
+                 title TEXT, 
+                 body TEXT, 
+                 status INT DEFAULT 0)''')
 
 def __create_tag_table(cursor):
   cursor.execute('''CREATE TABLE tags
