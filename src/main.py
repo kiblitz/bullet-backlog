@@ -7,6 +7,7 @@ import dir_handler
 import errors
 import init
 import new
+import relate
 import tag
 
 def __main():
@@ -40,18 +41,26 @@ def __main():
           return
       rest = rest[2:]
     new.new(title_given, title, body_given, body)
-  elif args[1] in ('tag', 'untag'):
+  elif args[1] in ('tag', 'untag', 'parent', 'unparent', 'child', 'unchild'):
     if num < 3:
       print(errors.no_task())
       return
     task = args[2]
-    tags = args[3:]
+    stuff = args[3:]
     if args[1] == 'tag':
-      tag.tag(task, tags)
+      tag.tag(task, stuff)
+    elif args[1] == 'untag':
+      tag.untag(task, stuff)
+    elif args[1] == 'parent':
+      relate.parent(task, stuff)
+    elif args[1] == 'unparent':
+      relate.unparent(task, stuff)
+    elif args[1] == 'child':
+      relate.child(task, stuff)
     else:
-      tag.untag(task, tags)
+      relate.unchild(task, stuff)
   else:
-    print(descriptions.unknown())
+    print(descriptions.unknown(args[1]))
 
 def __get_flags(keyword):
   pre = ('', '--')

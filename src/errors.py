@@ -14,5 +14,8 @@ def no_task():
 def task_not_found(task_id):
   pass
 
+def relative_not_found(relative_id):
+  pass
+
 def no_bullet():
   pass

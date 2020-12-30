@@ -21,8 +21,14 @@ def untag_task(path, task_id, tags):
 def parent_task(path, task_id, parents):
   __on_tasks_with_args(path, (__create_task_parents, task_id, parents))
 
+def unparent_task(path, task_id, parents):
+  __on_tasks_with_args(path, (__remove_task_parents, task_id, parents))
+
 def child_task(path, task_id, children):
   __on_tasks_with_args(path, (__create_task_children, task_id, children))
+
+def unchild_task(path, task_id, children):
+  __on_tasks_with_args(path, (__remove_task_children, task_id, children))
 
 def __create_task(cursor, title, body):
   __insert(cursor, 'tasks', ('title', 'body'), (title, body))
