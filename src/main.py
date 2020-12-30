@@ -40,13 +40,16 @@ def __main():
           return
       rest = rest[2:]
     new.new(title_given, title, body_given, body)
-  elif args[1] == 'tag':
+  elif args[1] in ('tag', 'untag'):
     if num < 3:
       print(errors.no_task())
       return
     task = args[2]
     tags = args[3:]
-    tag.tag(task, tags)
+    if args[1] == 'tag':
+      tag.tag(task, tags)
+    else:
+      tag.untag(task, tags)
   else:
     print(descriptions.unknown())
 

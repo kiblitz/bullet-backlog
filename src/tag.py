@@ -3,6 +3,12 @@ import dir_handler
 import errors
 
 def tag(task_id, tags):
+  __manage_tags(db_handler.tag_task, task_id, tags)
+
+def untag(task_id, tags):
+  __manage_tags(db_handler.untag_task, task_id, tags)
+
+def __manage_tags(action, task_id, tags):
   if not tags:
     print(errors.no_tags())
     return
@@ -10,8 +16,7 @@ def tag(task_id, tags):
   if not path:
     print(errors.no_bullet())
     return
-  if not db_handler.task_exists(path, task_id):
+  if not task_id.isdigit() or not db_handler.task_exists(path, task_id):
     print(errors.task_not_found(task_id))
     return
-
-  db_handler.tag_task(path, task_id, tags)
+  action(path, task_id, tags)

@@ -15,6 +15,9 @@ def new_task(path, title, body):
 def tag_task(path, task_id, tags):
   __on_tasks_with_args(path, (__create_task_tags, task_id, tags))
 
+def untag_task(path, task_id, tags):
+  __on_tasks_with_args(path, (__remove_task_tags, task_id, tags))
+
 def parent_task(path, task_id, parents):
   __on_tasks_with_args(path, (__create_task_parents, task_id, parents))
 
@@ -38,6 +41,26 @@ def __create_task_children(cursor, task_id, children):
     __insert(cursor, 'children', ('task_id', 'child_id'), (task_id, child))
     __insert(cursor, 'parents', ('task_id', 'parent_id'), (child, task_id))
 
+def __remove_task(cursor, task_id):
+  __remove(cursor, 'tasks', 'task_id=%s' % task_id)
+  __remove(cursor, 'tags', 'task_id=%s' % task_id)
+  __remove(cursor, 'parents', 'task_id=%s OR parent_id=%s' % (task_id, task_id))
+  __remove(cursor, 'children', 'task_id=%s OR child_id=%s' % (task_id, task_id))
+
+def __remove_task_tags(cursor, task_id, tags):
+  for tag in tags:
+    __remove(cursor, 'tags', 'task_id=%s AND tag=\'%s\'' % (task_id, tag))
+
+def __remove_task_parents(cursor, task_id, parents):
+  for parent in parents:
+    __remove(cursor, 'parents', 'task_id=%s AND parent_id=%s' % (task_id, parent))
+    __remove(cursor, 'children', 'task_id=%s AND child_id=%s' % (parent, task_id))
+
+def __remove_task_children(cursor, task_id, children):
+  for child in children:
+    __remove(cursor, 'children', 'task_id=%s AND child_id=%s' % (task_id, child))
+    __remove(cursor, 'parents', 'task_id=%s AND parent_id=%s' % (child, task_id))
+
 def task_exists(path, task_id):
   return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0
 
@@ -48,6 +71,11 @@ def __insert(cursor, table, columns, args):
 
 def __update(cursor, table, what, conditions):
   sql = "UPDATE " + table + " SET " + what + " WHERE " + conditions
+  cursor.execute(sql)
+  return cursor.lastrowid
+
+def __remove(cursor, table, conditions):
+  sql = "DELETE FROM " + table + " WHERE " + conditions
   cursor.execute(sql)
   return cursor.lastrowid
 
