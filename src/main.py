@@ -51,24 +51,29 @@ def __main():
       relate.child(task, stuff)
     else:
       relate.unchild(task, stuff)
-  elif args[1] in ('status', 'level', 'startdate', 'enddate', 'location'):
+  elif args[1] == 'set':
     if num < 3:
-      print(errors.no_task())
-      return
-    task = args[2]
-    if num < 4:
       print(errors.no_attribute())
-      return
-    if args[1] == 'status':
-      task_attributes.set_status(task, args[3])
-    elif args[1] == 'level':
-      task_attributes.set_level(task, args[3])
-    elif args[1] == 'startdate':
-      task_attributes.set_startdate(task, args[3])
-    elif args[1] == 'enddate':
-      task_attributes.set_enddate(task, args[3])
+    if args[2] in ('status', 'level', 'startdate', 'enddate', 'location'):
+      if num < 4:
+        print(errors.no_task())
+        return
+      task = args[3]
+      if num < 5:
+        print(errors.no_attribute_value())
+        return
+      if args[2] == 'status':
+        task_attributes.set_status(task, args[4])
+      elif args[2] == 'level':
+        task_attributes.set_level(task, args[4])
+      elif args[2] == 'startdate':
+        task_attributes.set_startdate(task, args[4])
+      elif args[2] == 'enddate':
+        task_attributes.set_enddate(task, args[4])
+      else:
+        task_attributes.set_location(task, args[4])
     else:
-      task_attributes.set_location(task, args[3])
+      print(errors.unknown_attribute(args[2]))
   else:
     print(descriptions.unknown(args[1]))
 

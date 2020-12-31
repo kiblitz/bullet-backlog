@@ -29,5 +29,11 @@ def invalid_date():
 def no_attribute():
   return __err_format('No attribute specified')
 
+def no_attribute_value():
+  return __err_format('No attribute value specified')
+
+def unknown_attribute(attribute):
+  return __err_format('Unknown attribute <%s>' % attribute)
+
 def __err_format(error):
   return 'Error: %s' % error
