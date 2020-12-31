@@ -20,6 +20,9 @@ def set_startdate(task_id, date):
 def set_enddate(task_id, date):
   __set_date(db_handler.set_task_enddate, task_id, date)
 
+def set_location(task_id, location):
+  __manage_attributes(db_handler.set_task_location, task_id, db_handler.to_text(location))
+
 def __set_date(action, task_id, date):
   date = date.lower()
   if date != 'none':

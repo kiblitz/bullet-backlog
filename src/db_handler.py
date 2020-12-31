@@ -42,6 +42,9 @@ def set_task_startdate(path, task_id, date):
 def set_task_enddate(path, task_id, date):
   __on_tasks_with_args(path, (__update_task_enddate, task_id, date))
 
+def set_task_location(path, task_id, location):
+  __on_tasks_with_args(path, (__update_task_location, task_id, location))
+
 def __create_task(cursor, title, body):
   __insert(cursor, 'tasks', ('title', 'body'), (title, body))
 
@@ -90,6 +93,9 @@ def __update_task_startdate(cursor, task_id, date):
 
 def __update_task_enddate(cursor, task_id, date):
   __update(cursor, 'tasks', 'enddate=%s' % date, 'task_id=%s' % task_id)
+
+def __update_task_location(cursor, task_id, location):
+  __update(cursor, 'tasks', 'location=%s' % location, 'task_id=%s' % task_id)
 
 def task_exists(path, task_id):
   return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0

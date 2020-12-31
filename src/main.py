@@ -51,7 +51,7 @@ def __main():
       relate.child(task, stuff)
     else:
       relate.unchild(task, stuff)
-  elif args[1] in ('status', 'level', 'startdate', 'enddate'):
+  elif args[1] in ('status', 'level', 'startdate', 'enddate', 'location'):
     if num < 3:
       print(errors.no_task())
       return
@@ -65,8 +65,10 @@ def __main():
       task_attributes.set_level(task, args[3])
     elif args[1] == 'startdate':
       task_attributes.set_startdate(task, args[3])
-    else:
+    elif args[1] == 'enddate':
       task_attributes.set_enddate(task, args[3])
+    else:
+      task_attributes.set_location(task, args[3])
   else:
     print(descriptions.unknown(args[1]))
 
