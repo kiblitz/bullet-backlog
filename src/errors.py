@@ -23,6 +23,9 @@ def invalid_status(code):
 def invalid_level(code):
   return __err_format('Invalid level <%s>' % code)
 
+def invalid_date():
+  return __err_format('Invalid date (\'MM-DD-YYYY\' or \'none\')')
+
 def no_attribute():
   return __err_format('No attribute specified')
 

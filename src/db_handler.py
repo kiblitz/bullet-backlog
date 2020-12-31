@@ -31,10 +31,16 @@ def unchild_task(path, task_id, children):
   __on_tasks_with_args(path, (__remove_task_children, task_id, children))
 
 def set_task_status(path, task_id, status):
-  __on_tasks_with_args(path, (__set_task_status, task_id, status))
+  __on_tasks_with_args(path, (__update_task_status, task_id, status))
 
 def set_task_level(path, task_id, level):
-  __on_tasks_with_args(path, (__set_task_level, task_id, level))
+  __on_tasks_with_args(path, (__update_task_level, task_id, level))
+
+def set_task_startdate(path, task_id, date):
+  __on_tasks_with_args(path, (__update_task_startdate, task_id, date))
+
+def set_task_enddate(path, task_id, date):
+  __on_tasks_with_args(path, (__update_task_enddate, task_id, date))
 
 def __create_task(cursor, title, body):
   __insert(cursor, 'tasks', ('title', 'body'), (title, body))
@@ -73,11 +79,17 @@ def __remove_task_children(cursor, task_id, children):
     __remove(cursor, 'children', 'task_id=%s AND child_id=%s' % (task_id, child))
     __remove(cursor, 'parents', 'task_id=%s AND parent_id=%s' % (child, task_id))
 
-def __set_task_status(cursor, task_id, status):
+def __update_task_status(cursor, task_id, status):
   __update(cursor, 'tasks', 'status=%s' % status, 'task_id=%s' % task_id)
 
-def __set_task_level(cursor, task_id, level):
+def __update_task_level(cursor, task_id, level):
   __update(cursor, 'tasks', 'level=%s' % level, 'task_id=%s' % task_id)
+
+def __update_task_startdate(cursor, task_id, date):
+  __update(cursor, 'tasks', 'startdate=%s' % date, 'task_id=%s' % task_id)
+
+def __update_task_enddate(cursor, task_id, date):
+  __update(cursor, 'tasks', 'enddate=%s' % date, 'task_id=%s' % task_id)
 
 def task_exists(path, task_id):
   return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0
@@ -155,6 +167,9 @@ def __create_task_table(cursor):
                 (task_id INTEGER PRIMARY KEY, 
                  title TEXT, 
                  body TEXT, 
+                 startdate TEXT DEFAULT 'none',
+                 enddate TEXT DEFAULT 'none',
+                 location TEXT DEFAULT 'none',
                  status INT DEFAULT 0,
                  level INT DEFAULT 0)''')
 
@@ -181,3 +196,6 @@ def __delete_child_table(cursor):
 
 def __delete_parent_table(cursor):
   cursor.execute('''DELETE FROM parents''')
+
+def to_text(value):
+  return '\'%s\'' % value
