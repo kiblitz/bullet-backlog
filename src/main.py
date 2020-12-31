@@ -9,6 +9,7 @@ import init
 import new
 import relate
 import tag
+import task_attributes
 
 def __main():
   args = sys.argv
@@ -50,6 +51,18 @@ def __main():
       relate.child(task, stuff)
     else:
       relate.unchild(task, stuff)
+  elif args[1] in ('status', 'level'):
+    if num < 3:
+      print(errors.no_task())
+      return
+    task = args[2]
+    if num < 4:
+      print(errors.no_attribute())
+      return
+    if args[1] == 'status':
+      task_attributes.set_status(task, args[3])
+    else:
+      task_attributes.set_level(task, args[3])
   else:
     print(descriptions.unknown(args[1]))
 

@@ -13,3 +13,13 @@ def self_relative():
 
 def no_bullet():
   pass
+
+def invalid_status(code):
+  pass
+
+def invalid_level(code):
+  pass
+
+def no_attribute():
+  pass
+

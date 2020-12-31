@@ -30,6 +30,12 @@ def child_task(path, task_id, children):
 def unchild_task(path, task_id, children):
   __on_tasks_with_args(path, (__remove_task_children, task_id, children))
 
+def set_task_status(path, task_id, status):
+  __on_tasks_with_args(path, (__set_task_status, task_id, status))
+
+def set_task_level(path, task_id, level):
+  __on_tasks_with_args(path, (__set_task_level, task_id, level))
+
 def __create_task(cursor, title, body):
   __insert(cursor, 'tasks', ('title', 'body'), (title, body))
 
@@ -66,6 +72,12 @@ def __remove_task_children(cursor, task_id, children):
   for child in children:
     __remove(cursor, 'children', 'task_id=%s AND child_id=%s' % (task_id, child))
     __remove(cursor, 'parents', 'task_id=%s AND parent_id=%s' % (child, task_id))
+
+def __set_task_status(cursor, task_id, status):
+  __update(cursor, 'tasks', 'status=%s' % status, 'task_id=%s' % task_id)
+
+def __set_task_level(cursor, task_id, level):
+  __update(cursor, 'tasks', 'level=%s' % level, 'task_id=%s' % task_id)
 
 def task_exists(path, task_id):
   return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0
@@ -143,7 +155,8 @@ def __create_task_table(cursor):
                 (task_id INTEGER PRIMARY KEY, 
                  title TEXT, 
                  body TEXT, 
-                 status INT DEFAULT 0)''')
+                 status INT DEFAULT 0,
+                 level INT DEFAULT 0)''')
 
 def __create_tag_table(cursor):
   cursor.execute('''CREATE TABLE tags
