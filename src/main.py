@@ -72,54 +72,58 @@ def __main():
 
   elif args[1] == 'set':
     if num < 3:
-      print(errors.no_attribute())
+      print(errors.no_task())
+      return
+    rest = args[2:]
+    mode = 'task'
+    if rest[0] == 'subtask':
+      mode = rest[0]
+      rest = rest[1:]
+    rest_num = len(rest)
+    if rest_num < 1:
+      print(errors.no_subtask()) 
       return
     set_commands = ('status', 'level', 'startdate', 'enddate', 'location')
     task_set_actions = (task_attributes.set_status, 
-                           task_attributes.set_level,
-                           task_attributes.set_startdate,
-                           task_attributes.set_enddate,
-                           task_attributes.set_location)
+                        task_attributes.set_level,
+                        task_attributes.set_startdate,
+                        task_attributes.set_enddate,
+                        task_attributes.set_location)
     subtask_set_actions = (task_attributes.set_subtask_status, 
                            task_attributes.set_subtask_level,
                            task_attributes.set_subtask_startdate,
                            task_attributes.set_subtask_enddate,
                            task_attributes.set_subtask_location)
-    if args[2] == 'subtask':
-      if num < 4:
-        print(errors.no_attribute())
-        return
-      __handle_set_attribute(args[1:], 
+    if mode == 'subtask':
+      __handle_set_attribute(rest, 
                              set_commands, 
                              subtask_set_actions, 
-                             errors.no_subtask, 
-                             num - 1)
+                             rest_num)
     else:
-      __handle_set_attribute(args, 
+      __handle_set_attribute(rest, 
                              set_commands, 
                              task_set_actions, 
-                             errors.no_task, 
-                             num)
+                             rest_num)
 
   else:
     print(descriptions.unknown(args[1]))
 
-def __handle_set_attribute(args, set_commands, set_actions, no_row_error, num):
-  if args[2] in set_commands:
-    if num < 4:
-      print(no_row_error())
-      return
-    task = args[3]
-    if num < 5:
+def __handle_set_attribute(args, set_commands, set_actions, num):
+  task = args[0]
+  if num < 2:
+    print(errors.no_attribute())
+    return
+  if args[1] in set_commands:
+    if num < 3:
       print(errors.no_attribute_value())
       return
     for i in range(len(set_commands)):
-      if args[2] == set_commands[i]:
-        set_actions[i](task, args[4])
+      if args[1] == set_commands[i]:
+        set_actions[i](task, args[2])
         return
     print(errors.assertion_failure())
   else:
-    print(errors.unknown_attribute(args[2]))
+    print(errors.unknown_attribute(args[1]))
 
 def __get_flags(keyword):
   pre = ('', '--')
