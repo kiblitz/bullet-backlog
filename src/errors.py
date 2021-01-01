@@ -2,14 +2,26 @@
 def bullet_exists():
   return __err_format('Bullet already exists')
 
+def no_item():
+  return __err_format('No item type specified')
+
+def unknown_item(new):
+  return __err_format('Unknown item type <%s>' % new)
+
 def no_tags():
   return __err_format('No tags specified')
 
 def no_task():
   return __err_format('No task id specified')
 
+def no_subtask():
+  return __err_format('No subtask id specified')
+
 def task_not_found(task_id):
   return __err_format('Unrecognized task id <%s>' % task_id)
+
+def subtask_not_found(subtask_id):
+  return __err_format('Unrecognized subtask id <%s>' % subtask_id)
 
 def self_relative():
   return __err_format('Cannot relate task with itself')
@@ -34,6 +46,9 @@ def no_attribute_value():
 
 def unknown_attribute(attribute):
   return __err_format('Unknown attribute <%s>' % attribute)
+
+def assertion_failure():
+  return __err_format('Assertion failure: report bug')
 
 def __err_format(error):
   return 'Error: %s' % error

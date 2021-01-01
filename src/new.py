@@ -2,10 +2,30 @@ import db_handler
 import dir_handler
 import errors
 
-def new(title_given, title, body_given, body):
+def task(title_given, title, body_given, body):
+  __new(db_handler.new_task, 
+        None,
+        title_given, 
+        title, 
+        body_given, 
+        body)
+
+def subtask(title_given, task_id, title, body_given, body):
+  __new(db_handler.new_subtask, 
+        task_id, 
+        title_given, 
+        title, 
+        body_given, 
+        body)
+
+def __new(action, task_id, title_given, title, body_given, body):
   path = dir_handler.find_bullet()
   if not path:
     print(errors.no_bullet())
+    return
+
+  if task_id and (not task_id.isdigit() or not db_handler.task_exists(path, task_id)):
+    print(errors.task_not_found(task_id))
     return
 
   if not title_given:
@@ -13,4 +33,7 @@ def new(title_given, title, body_given, body):
   if not body_given:
     body = input('body: ')
 
-  db_handler.new_task(path, title, body)
+  if task_id: 
+    action(path, task_id, title, body)
+  else:
+    action(path, title, body)

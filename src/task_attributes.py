@@ -21,9 +21,54 @@ def set_enddate(task_id, date):
   __set_date(db_handler.set_task_enddate, task_id, date)
 
 def set_location(task_id, location):
-  __manage_attributes(db_handler.set_task_location, task_id, db_handler.to_text(location))
+  __manage_attributes(db_handler.set_task_location, 
+                      task_id, 
+                      db_handler.to_text(location))
 
-def __set_date(action, task_id, date):
+def set_subtask_status(subtask_id, status):
+  if not get_status(status):
+    return
+  __manage_attributes(db_handler.set_subtask_status, 
+                      subtask_id, 
+                      status,
+                      db_handler.subtask_exists,
+                      errors.subtask_not_found)
+
+def set_subtask_level(subtask_id, level):
+  if not get_level(level):
+    return
+  __manage_attributes(db_handler.set_subtask_level, 
+                      subtask_id, 
+                      level,
+                      db_handler.subtask_exists,
+                      errors.subtask_not_found)
+
+def set_subtask_startdate(subtask_id, date):
+  __set_date(db_handler.set_subtask_startdate, 
+             subtask_id, 
+             date,
+             db_handler.subtask_exists,
+             errors.subtask_not_found)
+
+def set_subtask_enddate(subtask_id, date):
+  __set_date(db_handler.set_subtask_enddate, 
+             subtask_id, 
+             date,
+             db_handler.subtask_exists,
+             errors.subtask_not_found)
+
+def set_subtask_location(subtask_id, location):
+  __manage_attributes(db_handler.set_subtask_location, 
+                      subtask_id, 
+                      db_handler.to_text(location),
+                      db_handler.subtask_exists,
+                      errors.subtask_not_found)
+
+def __set_date(action, 
+               task_id, 
+               date, 
+               task_exist_checker=db_handler.task_exists, 
+               task_not_found_error=errors.task_not_found):
   date = date.lower()
   if date != 'none':
     try:
@@ -36,15 +81,23 @@ def __set_date(action, task_id, date):
     except:
       print(errors.invalid_date())
       return
-  __manage_attributes(action, task_id, db_handler.to_text(date))
+  __manage_attributes(action, 
+                      task_id, 
+                      db_handler.to_text(date), 
+                      task_exist_checker, 
+                      task_not_found_error)
 
-def __manage_attributes(action, task_id, value):
+def __manage_attributes(action, 
+                        task_id, 
+                        value, 
+                        task_exist_checker=db_handler.task_exists, 
+                        task_not_found_error=errors.task_not_found):
   path = dir_handler.find_bullet()
   if not path:
     print(errors.no_bullet())
     return
-  if not task_id.isdigit() or not db_handler.task_exists(path, task_id):
-    print(errors.task_not_found(task_id))
+  if not task_id.isdigit() or not task_exist_checker(path, task_id):
+    print(task_not_found_error(task_id))
     return
   action(path, task_id, value)
 
