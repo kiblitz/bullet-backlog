@@ -1,4 +1,5 @@
 import sqlite3
+import errors
 
 def create_tasks_db(path):
   __on_tasks(path, __create_task_tables)
@@ -32,6 +33,19 @@ def child_task(path, task_id, children):
 
 def unchild_task(path, task_id, children):
   __on_tasks_with_args(path, (__remove_task_children, task_id, children))
+
+def __will_create_loop(cursor, parent, child):
+  nodes = [parent]
+  seen = {parent}
+  while nodes and int(child) not in nodes:
+    first = nodes[0]
+    comm = 'SELECT parent_id FROM parents where task_id=%s' % first
+    lst = list(map(lambda x: x[0], cursor.execute(comm).fetchall()))
+    new_lst = [elem for elem in lst if elem not in seen]
+    nodes = nodes[1:] 
+    nodes.extend(new_lst)
+    seen.update(new_lst)
+  return int(child) in nodes
 
 def set_task_status(path, task_id, status):
   __on_tasks_with_args(path, (__update_task_status, task_id, status))
@@ -75,11 +89,23 @@ def __create_task_tags(cursor, task_id, tags):
 
 def __create_task_parents(cursor, task_id, parents):
   for parent in parents:
+    if __will_create_loop(cursor, parent, task_id):
+      print(errors.creates_loop(parent, task_id))
+      break
+    if __relation_exists(cursor, parent, task_id):
+      print(errors.relation_exists(parent, task_id))
+      break
     __insert(cursor, 'parents', ('task_id', 'parent_id'), (task_id, parent))
     __insert(cursor, 'children', ('task_id', 'child_id'), (parent, task_id))
 
 def __create_task_children(cursor, task_id, children):
   for child in children:
+    if __will_create_loop(cursor, task_id, child):
+      print(errors.creates_loop(task_id, child))
+      break
+    if __relation_exists(cursor, task_id, child):
+      print(errors.relation_exists(task_id, child))
+      break
     __insert(cursor, 'children', ('task_id', 'child_id'), (task_id, child))
     __insert(cursor, 'parents', ('task_id', 'parent_id'), (child, task_id))
 
@@ -138,6 +164,10 @@ def task_exists(path, task_id):
 
 def subtask_exists(path, subtask_id):
   return len(__on_tasks_with_args(path, (__select, 'subtasks', '*', 'subtask_id=' + str(subtask_id)))[0]) != 0
+
+def __relation_exists(cursor, first_id, second_id):
+  return ((int(second_id),) in __select(cursor, 'children', 'child_id', 'task_id=%s' % first_id) 
+       or (int(second_id),) in __select(cursor, 'children', 'task_id', 'child_id=%s' % first_id))
 
 def __insert(cursor, table, columns, args):
   sql = "INSERT INTO " + table + __totuple(columns) + " VALUES" + __qmark_args(len(args))

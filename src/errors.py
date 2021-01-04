@@ -44,6 +44,15 @@ def no_attribute():
 def no_attribute_value():
   return __err_format('No attribute value specified')
 
+def no_relatives():
+  return __err_format('No relative specified')
+
+def relation_exists(parent_id, child_id):
+  return __err_format('Relation <%s> -> <%s> already exists' % (parent_id, child_id))
+
+def creates_loop(parent_id, child_id):
+  return __err_format('Relation <%s> -> <%s> creates ancestral loop' % (parent_id, child_id))
+
 def unknown_attribute(attribute):
   return __err_format('Unknown attribute <%s>' % attribute)
 
