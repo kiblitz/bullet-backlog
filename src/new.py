@@ -1,22 +1,27 @@
+import announce
 import db_handler
 import dir_handler
 import errors
 
 def task(title_given, title, body_given, body):
-  __new(db_handler.new_task, 
-        None,
-        title_given, 
-        title, 
-        body_given, 
-        body)
+  res = __new(db_handler.new_task, 
+              None,
+              title_given, 
+              title, 
+              body_given, 
+              body)
+  if res:
+    print(announce.new_task(res[0], res[1]))
 
 def subtask(title_given, task_id, title, body_given, body):
-  __new(db_handler.new_subtask, 
-        task_id, 
-        title_given, 
-        title, 
-        body_given, 
-        body)
+  res = __new(db_handler.new_subtask, 
+              task_id, 
+              title_given, 
+              title, 
+              body_given, 
+              body)
+  if res:
+    print(announce.new_subtask(res[0], res[1]))
 
 def __new(action, task_id, title_given, title, body_given, body):
   path = dir_handler.find_bullet()
@@ -37,3 +42,4 @@ def __new(action, task_id, title_given, title, body_given, body):
     action(path, task_id, title, body)
   else:
     action(path, title, body)
+  return (title, body)

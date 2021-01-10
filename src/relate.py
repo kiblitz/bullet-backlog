@@ -1,18 +1,27 @@
+import announce
 import db_handler
 import dir_handler
 import errors
 
 def parent(task_id, parents):
-  __manage_relations(db_handler.parent_task, task_id, parents)
+  res = __manage_relations(db_handler.parent_task, task_id, parents)
+  if res:
+    print(announce.parented(task_id, parents))
 
 def unparent(task_id, parents):
-  __manage_relations(db_handler.unparent_task, task_id, parents)
+  res = __manage_relations(db_handler.unparent_task, task_id, parents)
+  if res:
+    print(announce.unparented(task_id, parents))
 
 def child(task_id, children):
-  __manage_relations(db_handler.child_task, task_id, children)
+  res = __manage_relations(db_handler.child_task, task_id, children)
+  if res:
+    print(announce.childed(task_id, children))
 
 def unchild(task_id, children):
-  __manage_relations(db_handler.unchild_task, task_id, children)
+  res = __manage_relations(db_handler.unchild_task, task_id, children)
+  if res:
+    print(announce.unchilded(task_id, children))
 
 def __manage_relations(action, task_id, relatives):
   if not relatives:
@@ -36,3 +45,4 @@ def __manage_relations(action, task_id, relatives):
   if not valid:
     return
   action(path, task_id, relatives)
+  return True
