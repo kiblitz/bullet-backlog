@@ -21,7 +21,7 @@ def subtask(title_given, task_id, title, body_given, body):
               body_given, 
               body)
   if res:
-    print(announce.new_subtask(res[0], res[1]))
+    print(announce.new_subtask(task_id, res[0], res[1]))
 
 def __new(action, task_id, title_given, title, body_given, body):
   path = dir_handler.find_bullet()

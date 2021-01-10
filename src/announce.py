@@ -3,10 +3,10 @@ def init():
   return 'Created bullet in this folder'
 
 def new_task(title, body):
-  return __new_entry('task', title, body)
+  return 'Created new task -> %s: %s' % (title, body)
 
-def new_subtask(title, body):
-  return __new_entry('subtask', title, body)
+def new_subtask(task_id, title, body):
+  return 'Created new subtask under task (%s) -> %s: %s' % (task_id, title, body)
 
 def status_set(task_id, status):
   return __attr_set('task', task_id, 'status', status)
@@ -49,9 +49,6 @@ def childed(task_id, children):
 
 def unchilded(task_id, children):
   return __relation_set('Removed', 'children', task_id, children)
-
-def __new_entry(entry_type, title, body):
-  return 'Created new %s - %s: %s' % (entry_type, title, body)
 
 def __relation_set(action, relation_type, task_id, relation_ids):
   return '%s task (%s) %s: (%s)' % (action, task_id, relation_type, ','.join(relation_ids))

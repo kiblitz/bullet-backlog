@@ -25,7 +25,7 @@ def set_startdate(task_id, date):
     print(announce.startdate_set(task_id, date))
 
 def set_enddate(task_id, date):
-  res __set_date(db_handler.set_task_enddate, task_id, date)
+  res = __set_date(db_handler.set_task_enddate, task_id, date)
   if res:
     print(announce.enddate_set(task_id, date))
 
