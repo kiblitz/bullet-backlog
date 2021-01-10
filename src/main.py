@@ -10,6 +10,7 @@ import new
 import relate
 import tag
 import task_attributes
+import visual
 
 def __main():
   args = sys.argv
@@ -105,6 +106,17 @@ def __main():
                              task_set_actions, 
                              rest_num)
 
+  elif args[1] == 'show':
+    if num < 3:
+      visual.show_relevant()
+      return
+    comm = args[2]
+    if comm in __get_flags('all'):
+      visual.show_all()
+    elif comm in __get_flags('unfinished'):
+      visual.show_unfinished()
+    else:
+      print(errors.unknown_visual_mode(comm))
   else:
     print(descriptions.unknown(args[1]))
 

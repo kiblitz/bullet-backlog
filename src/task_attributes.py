@@ -72,7 +72,7 @@ def __set_date(action,
   date = date.lower()
   if date != 'none':
     try:
-      spldate = date.split('-')
+      spldate = date.split('/')
       if len(spldate) != 3:
         raise Exception()
       datetime.datetime(month=int(spldate[0]), 
@@ -102,6 +102,7 @@ def __manage_attributes(action,
   action(path, task_id, value)
 
 def get_status(code):
+  code = str(code)
   if code == '0':
     return 'None'
   if code == '1':
@@ -111,10 +112,11 @@ def get_status(code):
   if code == '3':
     return 'In Progress'
   if code == '4':
-    return 'Completed'
+    return 'Complete'
   print(errors.invalid_status(code))
 
 def get_level(code):
+  code = str(code)
   if code == '0':
     return 'None'
   if code == '1':

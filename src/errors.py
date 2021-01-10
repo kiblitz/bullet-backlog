@@ -36,7 +36,7 @@ def invalid_level(code):
   return __err_format('Invalid level <%s>' % code)
 
 def invalid_date():
-  return __err_format('Invalid date (\'MM-DD-YYYY\' or \'none\')')
+  return __err_format('Invalid date (\'MM/DD/YYYY\' or \'none\')')
 
 def no_attribute():
   return __err_format('No attribute specified')
@@ -55,6 +55,9 @@ def creates_loop(parent_id, child_id):
 
 def unknown_attribute(attribute):
   return __err_format('Unknown attribute <%s>' % attribute)
+
+def unknown_visual_mode(mode):
+  return __err_format('Unknown visual mode %s' % mode)
 
 def assertion_failure():
   return __err_format('Assertion failure: report bug')

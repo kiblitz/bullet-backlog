@@ -34,19 +34,6 @@ def child_task(path, task_id, children):
 def unchild_task(path, task_id, children):
   __on_tasks_with_args(path, (__remove_task_children, task_id, children))
 
-def __will_create_loop(cursor, parent, child):
-  nodes = [parent]
-  seen = {parent}
-  while nodes and int(child) not in nodes:
-    first = nodes[0]
-    comm = 'SELECT parent_id FROM parents where task_id=%s' % first
-    lst = list(map(lambda x: x[0], cursor.execute(comm).fetchall()))
-    new_lst = [elem for elem in lst if elem not in seen]
-    nodes = nodes[1:] 
-    nodes.extend(new_lst)
-    seen.update(new_lst)
-  return int(child) in nodes
-
 def set_task_status(path, task_id, status):
   __on_tasks_with_args(path, (__update_task_status, task_id, status))
 
@@ -76,6 +63,29 @@ def set_subtask_enddate(path, subtask_id, date):
 
 def set_subtask_location(path, subtask_id, location):
   __on_tasks_with_args(path, (__update_subtask_location, subtask_id, location))
+
+def get_all(path):
+  data = __on_tasks_with_args(path, 
+                              (__select, 'tasks', '*', 'TRUE'),
+                              (__select, 'subtasks', '*', 'TRUE'),
+                              (__select, 'tags', '*', 'TRUE'),
+                              (__select, 'parents', '*', 'TRUE'),
+                              (__select, 'children', '*', 'TRUE'),
+                              row_factory=sqlite3.Row)
+  data_dict = {}
+  tables = ('tasks', 'subtasks', 'tags', 'parents', 'children')
+  for i in range(len(tables)):
+    data_dict[tables[i]] = data[i]
+  return data_dict
+
+def task_exists(path, task_id):
+  return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0
+
+def subtask_exists(path, subtask_id):
+  return len(__on_tasks_with_args(path, (__select, 'subtasks', '*', 'subtask_id=' + str(subtask_id)))[0]) != 0
+
+def to_text(value):
+  return '\'%s\'' % value
 
 def __create_task(cursor, title, body):
   __insert(cursor, 'tasks', ('title', 'body'), (title, body))
@@ -159,12 +169,6 @@ def __update_subtask_enddate(cursor, subtask_id, date):
 def __update_subtask_location(cursor, subtask_id, location):
   __update(cursor, 'subtasks', 'location=%s' % location, 'subtask_id=%s' % subtask_id)
 
-def task_exists(path, task_id):
-  return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0
-
-def subtask_exists(path, subtask_id):
-  return len(__on_tasks_with_args(path, (__select, 'subtasks', '*', 'subtask_id=' + str(subtask_id)))[0]) != 0
-
 def __relation_exists(cursor, first_id, second_id):
   return ((int(second_id),) in __select(cursor, 'children', 'child_id', 'task_id=%s' % first_id) 
        or (int(second_id),) in __select(cursor, 'children', 'task_id', 'child_id=%s' % first_id))
@@ -189,21 +193,10 @@ def __select(cursor, table, what, conditions):
   cursor.execute(sql)
   return cursor.fetchall()
 
-def __qmark_args(num):
-  s = '('
-  for i in range(num - 1):
-    s += '?,'
-  return s + '?)'
-
-def __totuple(args):
-  s = '('
-  for arg in args:
-    s += arg + ','
-  return s[:len(s)-1] + ')'
-
-def __on_tasks(path, *argv):
+def __on_tasks(path, *argv, row_factory=None):
   db_path = path + 'tasks.db'
   conn = sqlite3.connect(db_path)
+  conn.row_factory = row_factory
   c = conn.cursor()
   res = []
   for arg in argv:
@@ -213,9 +206,10 @@ def __on_tasks(path, *argv):
   conn.close()
   return res
 
-def __on_tasks_with_args(path, *argv):
+def __on_tasks_with_args(path, *argv, row_factory=None):
   db_path = path + 'tasks.db'
   conn = sqlite3.connect(db_path)
+  conn.row_factory = row_factory
   c = conn.cursor()
   res = []
   for arg in argv:
@@ -289,5 +283,28 @@ def __delete_child_table(cursor):
 def __delete_parent_table(cursor):
   cursor.execute('''DELETE FROM parents''')
 
-def to_text(value):
-  return '\'%s\'' % value
+def __will_create_loop(cursor, parent, child):
+  nodes = [parent]
+  seen = {parent}
+  while nodes and int(child) not in nodes:
+    first = nodes[0]
+    comm = 'SELECT parent_id FROM parents where task_id=%s' % first
+    lst = list(map(lambda x: x[0], cursor.execute(comm).fetchall()))
+    new_lst = [elem for elem in lst if elem not in seen]
+    nodes = nodes[1:] 
+    nodes.extend(new_lst)
+    seen.update(new_lst)
+  return int(child) in nodes
+
+def __qmark_args(num):
+  s = '('
+  for i in range(num - 1):
+    s += '?,'
+  return s + '?)'
+
+def __totuple(args):
+  s = '('
+  for arg in args:
+    s += arg + ','
+  return s[:len(s)-1] + ')'
+
