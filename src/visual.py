@@ -105,9 +105,8 @@ def __task_attributes(task_row):
 def __task_tags(tag_rows):
   if not tag_rows:
     return None
-  tags = [tag_row['tag'] for tag_row in tag_rows]
   ret = ''
-  for tag in tags:
+  for tag in tag_rows:
     ret += '[%s] ' % tag
   return '| ' + ret[:-1]
 

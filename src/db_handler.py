@@ -16,6 +16,12 @@ def new_task(path, title, body):
 def new_subtask(path, task_id, title, body):
   __on_tasks_with_args(path, (__create_subtask, task_id, title, body))
 
+def delete_task(path, task_id):
+  __on_tasks_with_args(path, (__remove_task, task_id))
+
+def delete_subtask(path, task_id):
+  __on_tasks_with_args(path, (__remove_subtask, subtask_id))
+
 def tag_task(path, task_id, tags):
   __on_tasks_with_args(path, (__create_task_tags, task_id, tags))
 
@@ -124,6 +130,10 @@ def __remove_task(cursor, task_id):
   __remove(cursor, 'tags', 'task_id=%s' % task_id)
   __remove(cursor, 'parents', 'task_id=%s OR parent_id=%s' % (task_id, task_id))
   __remove(cursor, 'children', 'task_id=%s OR child_id=%s' % (task_id, task_id))
+  __remove(cursor, 'subtasks', 'task_id=%s' % task_id)
+
+def __remove_subtask(cursor, subtask_id):
+  __remove(cursor, 'subtasks', 'subtask_id=%s' % subtask_id)
 
 def __remove_task_tags(cursor, task_id, tags):
   for tag in tags:

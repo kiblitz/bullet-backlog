@@ -52,6 +52,24 @@ def __main():
     else:
       print(errors.unknown_item(args[2]))
 
+  elif args[1] == 'delete':
+    if num < 3:
+      print(errors.no_item())
+      return
+    if args[2] in ('task', 'subtask'):
+      if nums < 4:
+        print(errors.no_task())
+        return
+      task_id = args[3] 
+      rest = args[4:]
+      confirmed = any(x in __get_flags('confirm') for x in rest)
+      if args[2] == 'task':
+        delete.task(task_id, confirmed)
+      else:
+        delete.subtask(task_id, confirmed)
+    else:
+      print(errors.unknown_item(args[2]))
+
   elif args[1] in ('tag', 'untag', 'parent', 'unparent', 'child', 'unchild'):
     if num < 3:
       print(errors.no_task())

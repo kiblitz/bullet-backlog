@@ -38,6 +38,12 @@ def location_set(task_id, location):
 def subtask_location_set(subtask_id, location):
   return __attr_set('subtask', subtask_id, 'location', location)
 
+def tagged(task_id, tags):
+  return __relation_set('Added', 'tags', task_id, tags)
+
+def untagged(task_id, tags):
+  return __relation_set('Removed', 'tags', task_id, tags)
+
 def parented(task_id, parents):
   return __relation_set('Added', 'parents', task_id, parents)
 
