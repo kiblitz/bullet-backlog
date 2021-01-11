@@ -6,7 +6,13 @@ def new_task(title, body):
   return 'Created new task -> %s: %s' % (title, body)
 
 def new_subtask(task_id, title, body):
-  return 'Created new subtask under task (%s) -> %s: %s' % (task_id, title, body)
+  return 'Created new subtask under task <%s> -> %s: %s' % (task_id, title, body)
+
+def delete_task(task_id):
+  return 'Deleted task <%s>' % (task_id)
+
+def delete_subtask(task_id):
+  return 'Deleted subtask <%s>' % (task_id)
 
 def title_set(task_id, title):
   return __attr_set('task', task_id, 'title', title)
@@ -68,8 +74,11 @@ def childed(task_id, children):
 def unchilded(task_id, children):
   return __relation_set('Removed', 'children', task_id, children)
 
+def exited():
+  return 'Application exited: nothing done'
+
 def __relation_set(action, relation_type, task_id, relation_ids):
-  return '%s task (%s) %s: (%s)' % (action, task_id, relation_type, ','.join(relation_ids))
+  return '%s task <%s> %s: (%s)' % (action, task_id, relation_type, ','.join(relation_ids))
 
 def __attr_set(entry_type, entry_id, value_type, value):
-  return 'Set %s for %s (%s) to %s' % (value_type, entry_type, entry_id, value)
+  return 'Set %s for %s <%s> to %s' % (value_type, entry_type, entry_id, value)

@@ -33,10 +33,14 @@ def __new(action, task_id, title_given, title, body_given, body):
     print(errors.task_not_found(task_id))
     return
 
-  if not title_given:
-    title = input('title: ')
-  if not body_given:
-    body = input('body: ')
+  try:
+    if not title_given:
+      title = input('title: ')
+    if not body_given:
+      body = input('body: ')
+  except:
+    print(announce.exited())
+    return
 
   if task_id: 
     action(path, task_id, title, body)

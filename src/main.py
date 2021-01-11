@@ -2,6 +2,7 @@
 
 import sys
 
+import delete
 import descriptions
 import dir_handler
 import errors
@@ -57,7 +58,7 @@ def __main():
       print(errors.no_item())
       return
     if args[2] in ('task', 'subtask'):
-      if nums < 4:
+      if num < 4:
         print(errors.no_task())
         return
       task_id = args[3] 
