@@ -5,6 +5,20 @@ import db_handler
 import dir_handler
 import errors
 
+def set_title(task_id, title):
+  res = __manage_attributes(db_handler.set_task_title, 
+                            task_id, 
+                            db_handler.to_text(title))
+  if res:
+    print(announce.title_set(task_id, title))
+
+def set_body(task_id, body):
+  res = __manage_attributes(db_handler.set_task_body, 
+                            task_id, 
+                            db_handler.to_text(body))
+  if res:
+    print(announce.body_set(task_id, body))
+
 def set_status(task_id, status):
   if not get_status(status):
     return
@@ -35,6 +49,20 @@ def set_location(task_id, location):
                             db_handler.to_text(location))
   if res:
     print(announce.location_set(task_id, location))
+
+def set_subtask_title(subtask_id, title):
+  res = __manage_attributes(db_handler.set_subtask_title, 
+                            subtask_id, 
+                            db_handler.to_text(title))
+  if res:
+    print(announce.subtask_title_set(subtask_id, title))
+
+def set_subtask_body(subtask_id, body):
+  res = __manage_attributes(db_handler.set_subtask_body, 
+                            subtask_id, 
+                            db_handler.to_text(body))
+  if res:
+    print(announce.subtask_body_set(subtask_id, body))
 
 def set_subtask_status(subtask_id, status):
   if not get_status(status):

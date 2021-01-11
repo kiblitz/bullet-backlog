@@ -8,6 +8,18 @@ def new_task(title, body):
 def new_subtask(task_id, title, body):
   return 'Created new subtask under task (%s) -> %s: %s' % (task_id, title, body)
 
+def title_set(task_id, title):
+  return __attr_set('task', task_id, 'title', title)
+
+def subtask_title_set(subtask_id, title):
+  return __attr_set('subtask', subtask_id, 'title', title)
+
+def body_set(task_id, body):
+  return __attr_set('task', task_id, 'body', body)
+
+def subtask_body_set(subtask_id, body):
+  return __attr_set('subtask', subtask_id, 'body', body)
+
 def status_set(task_id, status):
   return __attr_set('task', task_id, 'status', status)
 

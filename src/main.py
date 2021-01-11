@@ -102,13 +102,23 @@ def __main():
     if rest_num < 1:
       print(errors.no_subtask()) 
       return
-    set_commands = ('status', 'level', 'startdate', 'enddate', 'location')
-    task_set_actions = (task_attributes.set_status, 
+    set_commands = ('title', 
+                    'body', 
+                    'status', 
+                    'level', 
+                    'startdate', 
+                    'enddate', 
+                    'location')
+    task_set_actions = (task_attributes.set_title,
+                        task_attributes.set_body,
+                        task_attributes.set_status, 
                         task_attributes.set_level,
                         task_attributes.set_startdate,
                         task_attributes.set_enddate,
                         task_attributes.set_location)
-    subtask_set_actions = (task_attributes.set_subtask_status, 
+    subtask_set_actions = (task_attributes.set_subtask_title,
+                           task_attributes.set_subtask_body,
+                           task_attributes.set_subtask_status, 
                            task_attributes.set_subtask_level,
                            task_attributes.set_subtask_startdate,
                            task_attributes.set_subtask_enddate,
@@ -149,7 +159,7 @@ def __handle_set_attribute(args, set_commands, set_actions, num):
       return
     for i in range(len(set_commands)):
       if args[1] == set_commands[i]:
-        set_actions[i](task, args[2])
+        set_actions[i](task, ' '.join(args[2:]).strip())
         return
     print(errors.assertion_failure())
   else:

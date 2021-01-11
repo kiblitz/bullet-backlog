@@ -40,6 +40,12 @@ def child_task(path, task_id, children):
 def unchild_task(path, task_id, children):
   __on_tasks_with_args(path, (__remove_task_children, task_id, children))
 
+def set_task_title(path, task_id, title):
+  __on_tasks_with_args(path, (__update_task_title, task_id, title))
+
+def set_task_body(path, task_id, body):
+  __on_tasks_with_args(path, (__update_task_body, task_id, body))
+
 def set_task_status(path, task_id, status):
   __on_tasks_with_args(path, (__update_task_status, task_id, status))
 
@@ -54,6 +60,12 @@ def set_task_enddate(path, task_id, date):
 
 def set_task_location(path, task_id, location):
   __on_tasks_with_args(path, (__update_task_location, task_id, location))
+
+def set_subtask_title(path, subtask_id, title):
+  __on_tasks_with_args(path, (__update_subtask_title, subtask_id, title))
+
+def set_subtask_body(path, subtask_id, body):
+  __on_tasks_with_args(path, (__update_subtask_body, subtask_id, body))
 
 def set_subtask_status(path, subtask_id, status):
   __on_tasks_with_args(path, (__update_subtask_status, subtask_id, status))
@@ -149,6 +161,12 @@ def __remove_task_children(cursor, task_id, children):
     __remove(cursor, 'children', 'task_id=%s AND child_id=%s' % (task_id, child))
     __remove(cursor, 'parents', 'task_id=%s AND parent_id=%s' % (child, task_id))
 
+def __update_task_title(cursor, task_id, title):
+  __update(cursor, 'tasks', 'title=%s' % title, 'task_id=%s' % task_id)
+
+def __update_task_body(cursor, task_id, body):
+  __update(cursor, 'tasks', 'body=%s' % body, 'task_id=%s' % task_id)
+
 def __update_task_status(cursor, task_id, status):
   __update(cursor, 'tasks', 'status=%s' % status, 'task_id=%s' % task_id)
 
@@ -163,6 +181,12 @@ def __update_task_enddate(cursor, task_id, date):
 
 def __update_task_location(cursor, task_id, location):
   __update(cursor, 'tasks', 'location=%s' % location, 'task_id=%s' % task_id)
+
+def __update_subtask_title(cursor, subtask_id, title):
+  __update(cursor, 'subtasks', 'title=%s' % title, 'subtask_id=%s' % subtask_id)
+
+def __update_subtask_body(cursor, subtask_id, body):
+  __update(cursor, 'subtasks', 'body=%s' % body, 'subtask_id=%s' % subtask_id)
 
 def __update_subtask_status(cursor, subtask_id, status):
   __update(cursor, 'subtasks', 'status=%s' % status, 'subtask_id=%s' % subtask_id)
@@ -184,22 +208,22 @@ def __relation_exists(cursor, first_id, second_id):
        or (int(second_id),) in __select(cursor, 'children', 'task_id', 'child_id=%s' % first_id))
 
 def __insert(cursor, table, columns, args):
-  sql = "INSERT INTO " + table + __totuple(columns) + " VALUES" + __qmark_args(len(args))
+  sql = 'INSERT INTO %s%s VALUES%s' % (table, __totuple(columns), __qmark_args(len(args)))
   cursor.execute(sql, args)
   return cursor.lastrowid
 
 def __update(cursor, table, what, conditions):
-  sql = "UPDATE " + table + " SET " + what + " WHERE " + conditions
+  sql = 'UPDATE %s SET %s WHERE %s' % (table, what, conditions)
   cursor.execute(sql)
   return cursor.lastrowid
 
 def __remove(cursor, table, conditions):
-  sql = "DELETE FROM " + table + " WHERE " + conditions
+  sql = 'DELETE FROM %s WHERE %s' % (table, conditions)
   cursor.execute(sql)
   return cursor.lastrowid
 
 def __select(cursor, table, what, conditions):
-  sql = "SELECT " + what + " FROM " + table + " WHERE " + conditions
+  sql = 'SELECT %s FROM %s WHERE %s' % (what, table, conditions)
   cursor.execute(sql)
   return cursor.fetchall()
 
