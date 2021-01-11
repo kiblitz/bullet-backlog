@@ -146,7 +146,7 @@ def __main():
     else:
       print(errors.unknown_visual_mode(comm))
   else:
-    print(descriptions.unknown(args[1]))
+    print(errors.unknown(args[1]))
 
 def __handle_set_attribute(args, set_commands, set_actions, num):
   task = args[0]

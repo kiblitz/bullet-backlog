@@ -59,6 +59,10 @@ def unknown_attribute(attribute):
 def unknown_visual_mode(mode):
   return __err_format('Unknown visual mode %s' % mode)
 
+
+def unknown(comm):
+  return __err_format('Unrecognized command <%s>' % comm)
+
 def assertion_failure():
   return __err_format('Assertion failure: report bug')
 
