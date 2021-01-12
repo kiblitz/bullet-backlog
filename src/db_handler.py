@@ -19,7 +19,7 @@ def new_subtask(path, task_id, title, body):
 def delete_task(path, task_id):
   __on_tasks_with_args(path, (__remove_task, task_id))
 
-def delete_subtask(path, task_id):
+def delete_subtask(path, subtask_id):
   __on_tasks_with_args(path, (__remove_subtask, subtask_id))
 
 def tag_task(path, task_id, tags):
