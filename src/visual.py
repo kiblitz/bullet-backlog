@@ -101,15 +101,14 @@ def __task_attributes(task_row):
     ret += ' {%s}' % task_attributes.get_status(status)
   if level != consts.LEVEL_NONE:
     ret += ' {%s}' % task_attributes.get_level(level)
-  daterange = ''
-  if startdate != 'none':
-    daterange = startdate 
-  if enddate != 'none':
-    if startdate:
-      daterange += ' ─ '
-    daterange += enddate
-  if daterange:
-    ret += ' (%s)' % daterange
+
+  if startdate == 'none':
+    startdate = ''
+  if enddate == 'none':
+    enddate = ''
+  if startdate or enddate:
+    ret += ' (%s ─ %s)' % (startdate, enddate)
+
   if location != 'none':
     ret += ' (%s)' % location
   if not ret:

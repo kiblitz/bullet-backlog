@@ -59,7 +59,10 @@ def __main():
       return
     if args[2] in ('task', 'subtask'):
       if num < 4:
-        print(errors.no_task())
+        if args[2] == 'task':
+          print(errors.no_task())
+        else:
+          print(errors.no_subtask()) 
         return
       task_id = args[3] 
       rest = args[4:]
@@ -92,48 +95,22 @@ def __main():
 
   elif args[1] == 'set':
     if num < 3:
-      print(errors.no_task())
+      print(errors.no_item())
       return
-    rest = args[2:]
-    mode = 'task'
-    if rest[0] == 'subtask':
-      mode = rest[0]
-      rest = rest[1:]
-    rest_num = len(rest)
-    if rest_num < 1:
-      print(errors.no_subtask()) 
-      return
-    set_commands = ('title', 
-                    'body', 
-                    'status', 
-                    'level', 
-                    'startdate', 
-                    'enddate', 
-                    'location')
-    task_set_actions = (task_attributes.set_title,
-                        task_attributes.set_body,
-                        task_attributes.set_status, 
-                        task_attributes.set_level,
-                        task_attributes.set_startdate,
-                        task_attributes.set_enddate,
-                        task_attributes.set_location)
-    subtask_set_actions = (task_attributes.set_subtask_title,
-                           task_attributes.set_subtask_body,
-                           task_attributes.set_subtask_status, 
-                           task_attributes.set_subtask_level,
-                           task_attributes.set_subtask_startdate,
-                           task_attributes.set_subtask_enddate,
-                           task_attributes.set_subtask_location)
-    if mode == 'subtask':
-      __handle_set_attribute(rest, 
-                             set_commands, 
-                             subtask_set_actions, 
+    if args[2] in ('task', 'subtask'):
+      rest = args[3:]
+      rest_num = len(rest)
+      if rest_num < 1:
+        if args[2] == 'task':
+          print(errors.no_task())
+        else:
+          print(errors.no_subtask()) 
+        return
+      __handle_set_attribute(args[2],
+                             rest, 
                              rest_num)
     else:
-      __handle_set_attribute(rest, 
-                             set_commands, 
-                             task_set_actions, 
-                             rest_num)
+      print(errors.unknown_item(args[2]))
 
   elif args[1] == 'show':
     rest = args[2:]
@@ -177,7 +154,32 @@ def __handle_visual_stack(filters, stack, arg):
   if comm:
     stack.append(comm)
 
-def __handle_set_attribute(args, set_commands, set_actions, num):
+def __handle_set_attribute(mode, args, num):
+  set_commands = ('title', 
+                  'body', 
+                  'status', 
+                  'level', 
+                  'startdate', 
+                  'enddate', 
+                  'location')
+  task_set_actions = (task_attributes.set_title,
+                      task_attributes.set_body,
+                      task_attributes.set_status, 
+                      task_attributes.set_level,
+                      task_attributes.set_startdate,
+                      task_attributes.set_enddate,
+                      task_attributes.set_location)
+  subtask_set_actions = (task_attributes.set_subtask_title,
+                         task_attributes.set_subtask_body,
+                         task_attributes.set_subtask_status, 
+                         task_attributes.set_subtask_level,
+                         task_attributes.set_subtask_startdate,
+                         task_attributes.set_subtask_enddate,
+                         task_attributes.set_subtask_location)
+  if mode == 'task':
+    set_actions = task_set_actions
+  else:
+    set_actions = subtask_set_actions
   task = args[0]
   if num < 2:
     print(errors.no_attribute())
