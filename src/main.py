@@ -136,18 +136,46 @@ def __main():
                              rest_num)
 
   elif args[1] == 'show':
-    if num < 3:
-      visual.show_relevant()
-      return
-    comm = args[2]
-    if comm in __get_flags('all'):
-      visual.show_all()
-    elif comm in __get_flags('unfinished'):
-      visual.show_unfinished()
-    else:
-      print(errors.unknown_visual_mode(comm))
+    rest = args[2:]
+    filters = [(visual.only_relevant, )]
+    stack = []
+    for arg in rest:
+      if arg == __get_flag('all'):
+        filters = []
+        stack = []
+      elif arg == __get_flag('relevant'):
+        __handle_visual_stack(filters, stack, arg)
+        filters.append((visual.only_relevant, ))
+      elif arg == __get_flag('unfinished'):
+        __handle_visual_stack(filters, stack, arg)
+        filters.append((visual.only_unfinished, ))
+      elif arg in (__get_flag('tags_any'), 
+                   __get_flag('tags_all'), 
+                   __get_flag('location')):
+        __handle_visual_stack(filters, stack, arg)
+      else:
+        if not stack:
+          print(errors.unknown_visual_mode(arg))
+          return
+        stack.append(arg)
+    __handle_visual_stack(filters, stack, '')
+    visual.show(filters)
   else:
     print(errors.unknown(args[1]))
+
+def __handle_visual_stack(filters, stack, arg):
+  if stack:
+    filters.append(stack.copy())
+    stack.clear()
+  comm = None
+  if arg == __get_flag('tags_any'):
+    comm = visual.tags_any_filter
+  elif arg == __get_flag('tags_all'):
+    comm = visual.tags_all_filter
+  elif arg == __get_flag('location'):
+    comm = visual.location_filter
+  if comm:
+    stack.append(comm)
 
 def __handle_set_attribute(args, set_commands, set_actions, num):
   task = args[0]
@@ -165,6 +193,9 @@ def __handle_set_attribute(args, set_commands, set_actions, num):
     print(errors.assertion_failure())
   else:
     print(errors.unknown_attribute(args[1]))
+
+def __get_flag(keyword):
+  return '--%s' % keyword
 
 def __get_flags(keyword):
   pre = ('', '--')

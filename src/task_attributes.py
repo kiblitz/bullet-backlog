@@ -53,14 +53,18 @@ def set_location(task_id, location):
 def set_subtask_title(subtask_id, title):
   res = __manage_attributes(db_handler.set_subtask_title, 
                             subtask_id, 
-                            db_handler.to_text(title))
+                            db_handler.to_text(title),
+                            db_handler.subtask_exists,
+                            errors.subtask_not_found)
   if res:
     print(announce.subtask_title_set(subtask_id, title))
 
 def set_subtask_body(subtask_id, body):
   res = __manage_attributes(db_handler.set_subtask_body, 
                             subtask_id, 
-                            db_handler.to_text(body))
+                            db_handler.to_text(body),
+                            db_handler.subtask_exists,
+                            errors.subtask_not_found)
   if res:
     print(announce.subtask_body_set(subtask_id, body))
 

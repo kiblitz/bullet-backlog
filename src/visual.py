@@ -3,20 +3,51 @@ import data
 import db_handler
 import task_attributes
 
-def show_all():
-  __show(__get_tasks_dict)
+def show(argv):
+  __show(argv)
 
-def show_relevant():
-  __show(__get_relevant_tasks_dict)
+def only_relevant(tasks_dict, tag_rows_dict, tables):
+  parents = tables['parents']
+  for i in range(len(parents)):
+    task_id = parents[i]['task_id']
+    parent_id = parents[i]['parent_id']
+    parent_level = tasks_dict[parent_id]['status']
+    if parent_level != consts.STATUS_COMPLETE:
+      tasks_dict.pop(task_id, None)
+  return tasks_dict
 
-def show_unfinished():
-  __show(__get_unfinished_tasks_dict)
+def only_unfinished(tasks_dict, tag_rows_dict, tables):
+  filtered_dict = {k:v for (k,v) in tasks_dict.items() 
+                   if v['status'] != consts.STATUS_COMPLETE}
+  return filtered_dict
 
-def __show(get_tasks_dict):
+def tags_any_filter(tasks_dict, tag_rows_dict, tables, *tags):
+  filtered_dict = {k:v for (k,v) in tasks_dict.items()
+                   if (k in tag_rows_dict and 
+                       any(tag in tag_rows_dict[k] for tag in tags))}
+  return filtered_dict
+
+def tags_all_filter(tasks_dict, tag_rows_dict, tables, *tags):
+  filtered_dict = {k:v for (k,v) in tasks_dict.items()
+                   if (k in tag_rows_dict and 
+                       all(tag in tag_rows_dict[k] for tag in tags))}
+  return filtered_dict
+
+def location_filter(tasks_dict, tag_rows_dict, tables, *locations):
+  filtered_dict = {k:v for (k,v) in tasks_dict.items()
+                   if (any(area.lower() == v['location'].lower() 
+                   for area in locations))}
+  return filtered_dict
+
+def __show(argv):
   tables = data.get()
-  tasks_dict = get_tasks_dict(tables)
+  tasks_dict = __get_tasks_dict(tables)
   subtasks_dict = __get_subtasks_dict(tables)
   tag_rows_dict = __get_tag_rows_dict(tables)
+  for arg in argv:
+    func = arg[0]
+    args = arg[1:]
+    tasks_dict = func(tasks_dict, tag_rows_dict, tables, *args)
   print('')
   for task_id in tasks_dict:
     task_row = tasks_dict[task_id]
@@ -32,23 +63,6 @@ def __get_tasks_dict(tables):
   for i in range(len(tasks)):
     tasks_dict[tasks[i]['task_id']] = tasks[i]
   return tasks_dict
-
-def __get_relevant_tasks_dict(tables):
-  tasks_dict = __get_tasks_dict(tables)
-  parents = tables['parents']
-  for i in range(len(parents)):
-    task_id = parents[i]['task_id']
-    parent_id = parents[i]['parent_id']
-    parent_level = tasks_dict[parent_id]['status']
-    if parent_level != consts.STATUS_COMPLETE:
-      tasks_dict.pop(task_id, None)
-  return tasks_dict
-
-def __get_unfinished_tasks_dict(tables):
-  tasks_dict = __get_relevant_tasks_dict(tables)
-  filtered_dict = {k:v for (k,v) in tasks_dict.items() 
-                   if v['status'] != consts.STATUS_COMPLETE}
-  return filtered_dict
 
 def __get_tag_rows_dict(tables):
   tag_rows_dict = {}

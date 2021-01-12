@@ -5,22 +5,22 @@ import errors
 
 def parent(task_id, parents):
   res = __manage_relations(db_handler.parent_task, task_id, parents)
-  if res:
+  if res and parents:
     print(announce.parented(task_id, parents))
 
 def unparent(task_id, parents):
   res = __manage_relations(db_handler.unparent_task, task_id, parents)
-  if res:
+  if res and parents:
     print(announce.unparented(task_id, parents))
 
 def child(task_id, children):
   res = __manage_relations(db_handler.child_task, task_id, children)
-  if res:
+  if res and children:
     print(announce.childed(task_id, children))
 
 def unchild(task_id, children):
   res = __manage_relations(db_handler.unchild_task, task_id, children)
-  if res:
+  if res and children:
     print(announce.unchilded(task_id, children))
 
 def __manage_relations(action, task_id, relatives):

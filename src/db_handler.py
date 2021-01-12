@@ -116,26 +116,36 @@ def __create_task_tags(cursor, task_id, tags):
     __insert(cursor, 'tags', ('task_id', 'tag'), (task_id, tag))
 
 def __create_task_parents(cursor, task_id, parents):
+  broken = set()
   for parent in parents:
     if __will_create_loop(cursor, parent, task_id):
       print(errors.creates_loop(parent, task_id))
+      broken.add(parent)
       break
     if __relation_exists(cursor, parent, task_id):
       print(errors.relation_exists(parent, task_id))
+      broken.add(parent)
       break
     __insert(cursor, 'parents', ('task_id', 'parent_id'), (task_id, parent))
     __insert(cursor, 'children', ('task_id', 'child_id'), (parent, task_id))
+  for parent in broken:
+    parents.remove(parent)
 
 def __create_task_children(cursor, task_id, children):
+  broken = set()
   for child in children:
     if __will_create_loop(cursor, task_id, child):
       print(errors.creates_loop(task_id, child))
+      broken.add(child)
       break
     if __relation_exists(cursor, task_id, child):
       print(errors.relation_exists(task_id, child))
+      broken.add(child)
       break
     __insert(cursor, 'children', ('task_id', 'child_id'), (task_id, child))
     __insert(cursor, 'parents', ('task_id', 'parent_id'), (child, task_id))
+  for child in broken:
+    children.remove(child)
 
 def __remove_task(cursor, task_id):
   __remove(cursor, 'tasks', 'task_id=%s' % task_id)
