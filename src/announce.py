@@ -32,6 +32,9 @@ def status_set(task_id, status):
 def subtask_status_set(subtask_id, status):
   return __attr_set('subtask', subtask_id, 'status', status)
 
+def all_subtasks_complete(task_id):
+  return 'All subtasks under task <%s> completed' % task_id
+
 def level_set(task_id, level):
   return __attr_set('task', task_id, 'level', level)
 

@@ -1,4 +1,6 @@
 import sqlite3
+
+import consts
 import errors
 
 def create_tasks_db(path):
@@ -95,6 +97,9 @@ def get_all(path):
   for i in range(len(tables)):
     data_dict[tables[i]] = data[i]
   return data_dict
+
+def all_sibling_subtasks_completed(path, subtask_id):
+  return __on_tasks_with_args(path, (__all_sibling_subtasks_completed, subtask_id))[0]
 
 def task_exists(path, task_id):
   return len(__on_tasks_with_args(path, (__select, 'tasks', '*', 'task_id=' + str(task_id)))[0]) != 0
@@ -326,6 +331,16 @@ def __delete_child_table(cursor):
 
 def __delete_parent_table(cursor):
   cursor.execute('''DELETE FROM parents''')
+
+def __all_sibling_subtasks_completed(cursor, subtask_id):
+  task_id = __select(cursor, 'subtasks', 'task_id', 'subtask_id=%s' % subtask_id)[0][0]
+  substatuses = list(map(lambda x: x[0], 
+                         __select(cursor, 'subtasks', 
+                                          'status', 
+                                          'task_id=%s' % task_id)))
+  return {'task': task_id, 
+          'complete': all(status == consts.STATUS_COMPLETE 
+                          for status in substatuses)}
 
 def __will_create_loop(cursor, parent, child):
   nodes = [parent]

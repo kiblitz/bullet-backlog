@@ -1,6 +1,7 @@
 import datetime
 
 import announce
+import consts
 import db_handler
 import dir_handler
 import errors
@@ -78,6 +79,10 @@ def set_subtask_status(subtask_id, status):
                             errors.subtask_not_found)
   if res:
     print(announce.subtask_status_set(subtask_id, get_status(status)))
+    if status == str(consts.STATUS_COMPLETE):
+      check = db_handler.all_sibling_subtasks_completed(res, subtask_id)
+      if check['complete']:
+        print(announce.all_subtasks_complete(check['task']))
 
 def set_subtask_level(subtask_id, level):
   if not get_level(level):
@@ -153,7 +158,7 @@ def __manage_attributes(action,
     print(task_not_found_error(task_id))
     return
   action(path, task_id, value)
-  return True
+  return path
 
 def get_status(code):
   code = str(code)
