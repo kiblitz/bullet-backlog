@@ -14,7 +14,7 @@ $ cd bullet-backlog
 $ pip install pyinstaller
 $ pyinstaller -D src/main.py -n bullet
 ```
-- Make bullet a terminal command by creating a symbolic link
+- Make `bullet` a terminal command by creating a symbolic link
 ```
 $ ln -s dist/bullet/bullet /usr/bin/
 ```
