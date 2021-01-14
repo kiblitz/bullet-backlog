@@ -204,5 +204,8 @@ def __get_flags(keyword):
   return (p + keyword for p in pre)
 
 if __name__ == "__main__":
-  __main()
+  try:
+    __main()
+  except:
+    pass
 
